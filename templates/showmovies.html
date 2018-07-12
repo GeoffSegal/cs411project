@@ -13,6 +13,7 @@
 				<td> {{ row.director}} </td>
 				<td> {{ row.year_released}} </td>
 				<td> {{ row.rating}} </td>
+				<td> <a href = "/addfavorites?action=post&favmovie={{ row.movie_id}}"> Add to Favorites </a></td>
 			</tr><br />
 			{% endfor %}
 		</tbody>
