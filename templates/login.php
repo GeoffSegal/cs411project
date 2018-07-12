@@ -11,8 +11,8 @@
 <html lang = "en">
    
    <head>
-      <title>http://su18-cs411-12.cs.illinois.edu</title>
-      <link href = "css/bootstrap.min.css" rel = "stylesheet">
+      <title>IMDb's Movie watcher</title>
+      <link href = "http://su18-cs411-12.cs.illinois.edu" rel = "stylesheet">
       
       <style>
          body {
@@ -84,11 +84,11 @@
             if (isset($_POST['login']) && !empty($_POST['username']) 
                && !empty($_POST['password'])) {
 				
-               if ($_POST['username'] == 'tutorialspoint' && 
+               if ($_POST['username'] == 'movie watcher' && 
                   $_POST['password'] == '1234') {
                   $_SESSION['valid'] = true;
                   $_SESSION['timeout'] = time();
-                  $_SESSION['username'] = 'tutorialspoint';
+                  $_SESSION['username'] = 'movie watcher';
                   
                   echo 'You have entered valid use name and password';
                }else {
@@ -105,7 +105,7 @@
             ?>" method = "post">
             <h4 class = "form-signin-heading"><?php echo $msg; ?></h4>
             <input type = "text" class = "form-control" 
-               name = "username" placeholder = "username = tutorialspoint" 
+               name = "username" placeholder = "username = movie watcher" 
                required autofocus></br>
             <input type = "password" class = "form-control"
                name = "password" placeholder = "password = 1234" required>
