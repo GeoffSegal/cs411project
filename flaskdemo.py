@@ -25,11 +25,13 @@ def showmovies():
 	with app.app_context():
 		moviesearch = request.args.get('movie')
 		cur = mysql.connection.cursor()
-		cur.execute(("select title, movie_id, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id AND title LIKE '%{}%';").format(moviesearch))
+		cur.execute(("select title, movies.movie_id, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id AND title LIKE '%{}%';").format(moviesearch))
 		rows = cur.fetchall()
 		cur.close()
 		return render_template('showmovies.html', data=rows)
 
+        
+@app.route('addfavorites', methods = ['POST'])
 def addfavorites():
 	with app.app_context():
 		moviesearch = request.args.get('favmovie')
