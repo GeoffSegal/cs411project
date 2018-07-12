@@ -24,7 +24,7 @@ def index():
 def showmovies():
 	with app.app_context():
 		cur = mysql.connection.cursor()
-		cur.execute("SELECT * FROM movies")
+		cur.execute("select title, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id;")
 		rows = cur.fetchall()
 		cur.close()
 		return render_template('showmovies.html', data=rows)
@@ -32,4 +32,3 @@ def showmovies():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
-
