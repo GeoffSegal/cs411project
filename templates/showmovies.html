@@ -1,0 +1,19 @@
+<html>
+	<title>website</title>
+	<body>
+		<tbody>
+			<tr>
+				<td> title </td>
+				<td> year released </td>
+				<td> rating </td>
+			</tr><br />
+			{% for row in data %}
+			<tr>
+				<td> {{ row.title}} </td>
+				<td> {{ row.year_released}} </td>
+				<td> {{ row.rating}} </td>
+			</tr><br />
+			{% endfor %}
+		</tbody>
+	</body>
+</html>
