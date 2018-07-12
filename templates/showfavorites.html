@@ -1,0 +1,13 @@
+<html>
+	<title>website</title>
+	<body>
+		<tbody>
+			{% for row in data %}
+			<tr>
+				<td> {{ row.title}} </td>
+				<td> <a href = "/removefavorites?action=post&favmovie={{ row.movie_id}}"> Remove From Favorites </a></td>
+			</tr><br />
+			{% endfor %}
+		</tbody>
+	</body>
+</html>

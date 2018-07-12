@@ -30,19 +30,37 @@ def showmovies():
 		cur.close()
 		return render_template('showmovies.html', data=rows)
 
-        
-@app.route('addfavorites', methods = ['POST'])
+
+@app.route('/addfavorites', methods = ['POST', 'GET'])
 def addfavorites():
 	with app.app_context():
 		moviesearch = request.args.get('favmovie')
+		cur2 = mysql.connection.cursor()
+		cur2.execute(("INSERT INTO favorites (user_id, movie_id) VALUES ('aa1234', '{}');").format(moviesearch))
+		mysql.connection.commit()
+		cur2.close()
 		cur = mysql.connection.cursor()
-		cur.execute(("INSERT INTO favorites (user_id, movie_id) VALUES ('aa1234', '{}';).format(moviesearch))
-		cur.commit()
-		cur.execute(("select title from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234'))
+		cur.execute(("select DISTINCT title, movies.movie_id from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234';"))
 		rows = cur.fetchall()
 		cur.close()
-		return render_template('shofavorites.html', data=rows)
+		return render_template('showfavorites.html', data=rows)
+
+@app.route('/removefavorites', methods = ['POST', 'GET'])
+def removefavorites():
+	with app.app_context():
+                moviesearch = request.args.get('favmovie')
+                cur2 = mysql.connection.cursor()
+                cur2.execute(("DELETE FROM favorites WHERE user_id = 'aa1234' AND movie_id = '{}';").format(moviesearch))
+                mysql.connection.commit()
+                cur2.close()
+                cur = mysql.connection.cursor()
+                cur.execute(("select DISTINCT title, movies.movie_id from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234';"))
+                rows = cur.fetchall()
+                cur.close()
+                return render_template('showfavorites.html', data=rows)
+
 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
+
