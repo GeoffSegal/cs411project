@@ -15,13 +15,13 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
-@app.route("/")
+@app.route("/login,methods = ['GET']")
 def login():
-    return render_template('login.php')
+    return render_template('login.php',data=rows)
 
-@app.route("/")
+@app.route("/logout,methods = ['GET']")
 def logout():
-    return render_template('logout.php')
+    return render_template('logout.php',data=rows)
 
 @app.route("/")
 def index():
