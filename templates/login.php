@@ -1,75 +1,121 @@
 <?php
-   include("config.php");
+   ob_start();
    session_start();
-   
-   if($_SERVER["REQUEST_METHOD"] == "POST") {
-      // username and password sent from form 
-      
-      $myusername = mysqli_real_escape_string($db,$_POST['username']);
-      $mypassword = mysqli_real_escape_string($db,$_POST['password']); 
-      
-      $sql = "SELECT id FROM admin WHERE username = '$myusername' and passcode = '$mypassword'";
-      $result = mysqli_query($db,$sql);
-      $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-      $active = $row['active'];
-      
-      $count = mysqli_num_rows($result);
-      
-      // If result matched $myusername and $mypassword, table row must be 1 row
-		
-      if($count == 1) {
-         session_register("myusername");
-         $_SESSION['login_user'] = $myusername;
-         
-         header("location: welcome.php");
-      }else {
-         $error = "Your Login Name or Password is invalid";
-      }
-   }
 ?>
-<html>
+
+<?
+   // error_reporting(E_ALL);
+   // ini_set("display_errors", 1);
+?>
+
+<html lang = "en">
    
    <head>
-      <title>Login Page</title>
+      <title>IMDb's Movie watcher</title>
+      <link href = "http://su18-cs411-12.cs.illinois.edu" rel = "stylesheet">
       
-      <style type = "text/css">
+      <style>
          body {
-            font-family:Arial, Helvetica, sans-serif;
-            font-size:14px;
+            padding-top: 100px;
+            padding-bottom: 40px;
+            background-color: #ADABAB;
          }
-         label {
-            font-weight:bold;
-            width:100px;
-            font-size:14px;
+         
+         .form-signin {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+            color: #017572;
          }
-         .box {
-            border:#666666 solid 1px;
+         
+         .form-signin .form-signin-heading,
+         .form-signin .checkbox {
+            margin-bottom: 10px;
+         }
+         
+         .form-signin .checkbox {
+            font-weight: normal;
+         }
+         
+         .form-signin .form-control {
+            position: relative;
+            height: auto;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+         }
+         
+         .form-signin .form-control:focus {
+            z-index: 2;
+         }
+         
+         .form-signin input[type="email"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+            border-color:#017572;
+         }
+         
+         .form-signin input[type="password"] {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-color:#017573;
+         }
+         
+         h2{
+            text-align: center;
+            color: #017572;
          }
       </style>
       
    </head>
-   
-   <body bgcolor = "#FFFFFF">
 	
-      <div align = "center">
-         <div style = "width:300px; border: solid 1px #333333; " align = "left">
-            <div style = "background-color:#333333; color:#FFFFFF; padding:3px;"><b>Login</b></div>
+   <body>
+      
+      <h2>Enter Username and Password</h2> 
+      <div class = "container form-signin">
+         
+         <?php
+            $msg = '';
+            
+            if (isset($_POST['login']) && !empty($_POST['username']) 
+               && !empty($_POST['password'])) {
 				
-            <div style = "margin:30px">
-               
-               <form action = "" method = "post">
-                  <label>UserName  :</label><input type = "text" name = "username" class = "box"/><br /><br />
-                  <label>Password  :</label><input type = "password" name = "password" class = "box" /><br/><br />
-                  <input type = "submit" value = " Submit "/><br />
-               </form>
-               
-               <div style = "font-size:11px; color:#cc0000; margin-top:10px"><?php echo $error; ?></div>
-					
-            </div>
-				
-         </div>
+               if ($_POST['username'] == 'movie watcher' && 
+                  $_POST['password'] == '1234') {
+                  $_SESSION['valid'] = true;
+                  $_SESSION['timeout'] = time();
+                  $_SESSION['username'] = 'movie watcher';
+                  
+                  echo 'You have entered valid use name and password';
+               }else {
+                  $msg = 'Wrong username or password';
+               }
+            }
+         ?>
+      </div> <!-- /container -->
+      
+      <div class = "container">
+      
+         <form class = "form-signin" role = "form" 
+            action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); 
+            ?>" method = "post">
+            <h4 class = "form-signin-heading"><?php echo $msg; ?></h4>
+            <input type = "text" class = "form-control" 
+               name = "username" placeholder = "username = movie watcher" 
+               required autofocus></br>
+            <input type = "password" class = "form-control"
+               name = "password" placeholder = "password = 1234" required>
+            <button class = "btn btn-lg btn-primary btn-block" type = "submit" 
+               name = "login">Login</button>
+         </form>
 			
-      </div>
-
+         Click here to clean <a href = "logout.php" tite = "Logout">Session.
+         
+      </div> 
+      
    </body>
 </html>
