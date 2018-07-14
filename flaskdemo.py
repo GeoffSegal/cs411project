@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
+import os
 
 app = Flask(__name__)
 
@@ -76,5 +77,6 @@ def removefavorites():
 
 
 if __name__ == "__main__":
+    app.secret_key = os.urandom(50)
     app.run(debug=True,host='0.0.0.0', port=4000)
 
