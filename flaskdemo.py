@@ -25,9 +25,6 @@ def login():
             return redirect(url_for('home'))
     return render_template('login.html', error=error)
 
-@app.route('/logout',methods = ['GET']")
-def logout():
-    return render_template('logout.php',data=rows)
 
 @app.route("/")
 def index():
