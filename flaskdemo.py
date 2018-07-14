@@ -5,8 +5,6 @@ from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
 
-app.debug = True
-
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
@@ -78,5 +76,5 @@ def removefavorites():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(debug=True,host='0.0.0.0', port=4000)
 
