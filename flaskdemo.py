@@ -24,7 +24,10 @@ def do_admin_login():
         flash('wrong password!')
     return index()
 
-
+@app.route("/logout")
+def logout():
+    session['logged_in'] = False
+    return index()
 
 @app.route("/")
 def index():
