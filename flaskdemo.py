@@ -15,9 +15,15 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
-@app.route('/login',methods = ['GET']")
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.php',data=rows)
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+            error = 'Invalid Credentials. Please try again.'
+        else:
+            return redirect(url_for('home'))
+    return render_template('login.html', error=error)
 
 @app.route('/logout',methods = ['GET']")
 def logout():
