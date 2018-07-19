@@ -30,10 +30,11 @@ def logout():
 
 @app.route("/")
 def index():
-    if not session.get('logged_in'):
-	return render_template('login.html')
-    else:
-    	return render_template('index2.html')
+#    if not session.get('logged_in'):
+#	return render_template('login.html')
+#    else:
+#    	return render_template('index2.html')
+     return render_template('index2.html')
 
 @app.route('/showmovies', methods = ['GET'])
 def showmovies():
