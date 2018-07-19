@@ -2,10 +2,9 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
+import os
 
 app = Flask(__name__)
-
-app.debug = True
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -15,17 +14,26 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
-@app.route("/login,methods = ['GET']")
-def login():
-    return render_template('login.php',data=rows)
 
-@app.route("/logout,methods = ['GET']")
+@app.route('/login', methods=['POST'])
+def do_admin_login():
+    if request.form['password'] == 'password' and request.form['username'] == 'admin':
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return index()
+
+@app.route("/logout")
 def logout():
-    return render_template('logout.php',data=rows)
+    session['logged_in'] = False
+    return index()
 
 @app.route("/")
 def index():
-    return render_template('index2.html')
+    if not session.get('logged_in'):
+	return render_template('login.html')
+    else:
+    	return render_template('index2.html')
 
 @app.route('/showmovies', methods = ['GET'])
 def showmovies():
@@ -86,5 +94,6 @@ def ratefavorites():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.secret_key = os.urandom(50)
+    app.run(debug=True,host='0.0.0.0', port=4000)
 
