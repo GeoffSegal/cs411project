@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 import os
@@ -11,8 +11,8 @@ engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'username']
-app.config['MYSQL_PASSWORD'] = 'password'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'movies'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
