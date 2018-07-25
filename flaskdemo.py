@@ -18,13 +18,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
  
-@app.route('/')
-def home():
-    if not session.get('logged_in'):
-        return render_template('login.html')
-    else:
-        return "Hello!  <a href='/logout'>Logout</a>"
- 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
  
