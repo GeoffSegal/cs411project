@@ -4,8 +4,6 @@ from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 import os
 from sqlalchemy.orm import sessionmaker
-from tabledef import *
-engine = create_engine('sqlite:///tutorial.db', echo=True)
  
 
 app = Flask(__name__)
