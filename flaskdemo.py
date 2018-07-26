@@ -22,7 +22,7 @@ mysql = MySQL(app)
 def login():
 error = None
 if 'username' in session:
-return redirect(url_for('index'))
+return render_template('index2.html')
 if request.method == 'POST':
 username_form  = request.form['username']
 password_form  = request.form['password']
@@ -32,7 +32,7 @@ if cur.fetchone()[0]:
     for row in cur.fetchall():
 	if md5(password_form).hexdigest() == row[0]:
 	    session['username'] = request.form['username']
-	    return redirect(url_for('index2'))
+	    return render_template('index2.html')
 	else:
 	    error = "wrong password!"
 else:
