@@ -18,22 +18,27 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
  
-@app.route('/login', methods=['POST'])
-def do_admin_login():
- 
-    POST_USERNAME = str(request.form['username'])
-    POST_PASSWORD = str(request.form['password'])
- 
-    Session = sessionmaker(bind=engine)
-    s = Session()
-    query = s.query(User).filter(User.username.in_([POST_USERNAME]), User.password.in_([POST_PASSWORD]) )
-    result = query.first()
-    if result:
-        session['logged_in'] = True
-    else:
-        flash('wrong password!')
-    return home()
- 
+@app.route('/login', methods=['POST']) 
+def login():
+error = None
+if 'username' in session:
+return redirect(url_for('index'))
+if request.method == 'POST':
+username_form  = request.form['username']
+password_form  = request.form['password']
+cur.execute("SELECT username FROM users WHERE name = %s;", [username_form]) 
+if cur.fetchone()[0]:
+    cur.execute("SELECT password FROM users WHERE name = %s;", [username_form]) 
+    for row in cur.fetchall():
+	if md5(password_form).hexdigest() == row[0]:
+	    session['username'] = request.form['username']
+	    return redirect(url_for('index2'))
+	else:
+	    error = "wrong password!"
+else:
+    error = "wrong password!"
+return render_template('login.html', error=error)
+
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
