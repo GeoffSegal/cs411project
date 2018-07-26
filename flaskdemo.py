@@ -60,7 +60,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return render_template('index2.html')
+    return render_template('login.html')
 
 
 @app.route('/showmovies', methods = ['GET'])
