@@ -35,14 +35,14 @@ def login():
     try:
         if request.method == 'POST':
             username_form  = request.form['username']
-            cur.execute("SELECT COUNT(1) FROM user WHERE name = {};"
+            cur.execute("SELECT username FROM user WHERE username = %s;"
                         .format(username_form))
 
             if not cur.fetchone()[0]:
                 raise ServerError('Invalid username')
 
             password_form  = request.form['password']
-            cur.execute("SELECT password FROM user WHERE name = {};"
+            cur.execute("SELECT password FROM user WHERE username = %s;"
                         .format(username_form))
 
             for row in cur.fetchall():
