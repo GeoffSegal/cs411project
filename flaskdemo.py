@@ -18,39 +18,44 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
  
-@app.route('/login', methods=['POST']) 
-def login():
-error = None
-if 'username' in session:
-return render_template('index2.html')
-if request.method == 'POST':
-username_form  = request.form['username']
-password_form  = request.form['password']
-cur.execute("SELECT username FROM users WHERE name = %s;", [username_form]) 
-if cur.fetchone()[0]:
-    cur.execute("SELECT password FROM users WHERE name = %s;", [username_form]) 
-    for row in cur.fetchall():
-	if md5(password_form).hexdigest() == row[0]:
-	    session['username'] = request.form['username']
-	    return render_template('index2.html')
-	else:
-	    error = "wrong password!"
-else:
-    error = "wrong password!"
-return render_template('login.html', error=error)
-
-@app.route("/logout")
-def logout():
-    session['logged_in'] = False
-    return home()
-
-	
-@app.route("/")
+@app.route('/')
 def index():
-    if not session.get('logged_in'):
-	return render_template('login.html')
-    else:
-    	return render_template('index2.html')
+    if 'username' in session:
+        return render_template('login.html')
+
+    username_session = escape(session['username']).capitalize()
+    return render_template('index2.html', session_user_name=username_session)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'username' in session:
+        return render_template('index2.html'）
+
+    error = None
+    try:
+        if request.method == 'POST':
+            username_form  = request.form['username']
+            cur.execute("SELECT COUNT(1) FROM user WHERE name = {};"
+                        .format(username_form))
+
+            if not cur.fetchone()[0]:
+                raise ServerError('Invalid username')
+
+            password_form  = request.form['password']
+            cur.execute("SELECT password FROM user WHERE name = {};"
+                        .format(username_form))
+
+            for row in cur.fetchall():
+                if md5(password_form).hexdigest() == row[0]:
+                    session['username'] = request.form['username']
+                    return render_template('index2.html'）
+
+            raise ServerError('Invalid password')
+    except ServerError as e:
+        error = str(e)
+
+    return render_template('login.html', error=error)
+
 
 @app.route('/showmovies', methods = ['GET'])
 def showmovies():
