@@ -8,10 +8,11 @@ from sqlalchemy.orm import sessionmaker
  
 
 app = Flask(__name__)
+app.secret_key = 'secret'
 
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'username'
-app.config['MYSQL_PASSWORD'] = 'password'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'movies'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -19,10 +20,11 @@ mysql = MySQL(app)
  
 @app.route('/')
 def home():
-    if 'username' in session:
+    if 'username' not in session:
         return render_template('login.html')
 
-    username_session = escape(session['username']).capitalize()
+    username_session = (session['username']).capitalize()
+    #username_session = escape(session['username']).capitalize()
     return render_template('index2.html', session_user_name=username_session)
 
 
@@ -35,24 +37,22 @@ def login():
     try:
         if request.method == 'POST':
 	    username_form  = request.form['username']
-		    cur.execute("SELECT username FROM user WHERE username = %s;"
-				.format(username_form))
-
-		    if not cur.fetchone()[0]:
-			raise ServerError('Invalid username')
-
-	    password_form  = request.form['password']
-		    cur.execute("SELECT password FROM user WHERE username = %s;"
-				.format(username_form))
-
-		    for row in cur.fetchall():
-			if md5(password_form).hexdigest() == row[0]:
-			    session['username'] = request.form['username']
-			    return render_template('index2.html')
-
-		    raise ServerError('Invalid password')
-
-    except ServerError as e:
+	    #password_form = sha256_crypt.hash(str(request.form['password']))
+            password_form = request.form['password']
+            cur = mysql.connection.cursor()
+	    cur.execute('SELECT username FROM user WHERE username = "{}";'.format(username_form))
+	    if not cur.fetchone():
+	        raise Exception('Invalid username')
+	    else:
+	        cur.execute('SELECT password FROM user WHERE username = "{}" AND password = "{}";'.format(username_form, password_form))
+	        if cur.fetchone():
+		    cur.close()
+	            session['username'] = username_form
+	            return render_template('index2.html')
+                cur.close()
+                raise Exception(password_form)
+	    #raise Exception('Invalid password')
+    except Exception as e:
         error = str(e)
 
     return render_template('login.html', error=error)
@@ -81,11 +81,11 @@ def addfavorites():
 		cur2 = mysql.connection.cursor()
 		cur2.execute(('SELECT 1 FROM favorites WHERE movie_id="{}";').format(moviesearch))
 		if not cur2.fetchone():
-			cur2.execute(("INSERT INTO favorites (user_id, movie_id) VALUES ('aa1234', '{}');").format(moviesearch))
+			cur2.execute(("INSERT INTO favorites (user_id, movie_id) VALUES ('{}', '{}');").format(session['username'], moviesearch))
 		mysql.connection.commit()
 		cur2.close()
 		cur = mysql.connection.cursor()
-		cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234';"))
+		cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
 		rows = cur.fetchall()
 		cur.close()
 		return render_template('showfavorites.html', data=rows)
@@ -95,11 +95,11 @@ def removefavorites():
 	with app.app_context():
                 moviesearch = request.args.get('favmovie')
                 cur2 = mysql.connection.cursor()
-                cur2.execute(("DELETE FROM favorites WHERE user_id = 'aa1234' AND movie_id = '{}';").format(moviesearch))
+                cur2.execute(("DELETE FROM favorites WHERE user_id = '{}' AND movie_id = '{}';").format(session['username'], moviesearch))
                 mysql.connection.commit()
                 cur2.close()
                 cur = mysql.connection.cursor()
-                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234';"))
+                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
                 rows = cur.fetchall()
                 cur.close()
                 return render_template('showfavorites.html', data=rows)
@@ -110,11 +110,11 @@ def ratefavorites():
                 moviesearch = request.args.get('favmovie')
                 movierating = request.args.get('movierating')
                 cur2 = mysql.connection.cursor()
-                cur2.execute(("UPDATE favorites set rating = {} WHERE user_id = 'aa1234' AND movie_id = '{}';").format(movierating, moviesearch))
+                cur2.execute(("UPDATE favorites set rating = {} WHERE user_id = '{}' AND movie_id = '{}';").format(movierating, session['username'], moviesearch))
                 mysql.connection.commit()
                 cur2.close()
                 cur = mysql.connection.cursor()
-                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = 'aa1234';"))
+                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
                 rows = cur.fetchall()
                 cur.close()
                 return render_template('showfavorites.html', data=rows)

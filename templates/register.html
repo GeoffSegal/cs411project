@@ -1,17 +1,13 @@
 {% block body %}
 {% if session['logged_in'] %}
 <p>You're logged in already!</p>
-
 {% else %}
-{% if error %}
-    <p class=error><strong>Error:</strong> {{ error }}
-{% endif %}
-
-
-<form action="/login" method="POST">
+<p>Register as a new user!</p>
+<form action="/registration" method="POST">
   <input type="username" name="username" placeholder="Username">
   <input type="password" name="password" placeholder="Password">
-  <input type="submit" value="Log in">
+  <input type="submit" value="registration">
 </form>
 {% endif %}
 {% endblock %}
+
