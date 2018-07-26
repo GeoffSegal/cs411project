@@ -5,7 +5,7 @@ from passlib.hash import sha256_crypt
 import os
 from sqlalchemy.orm import sessionmaker
 from tabledef import *
-engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo', echo=True)
+engine = create_engine('sqlite:///tutorial.db', echo=True)
  
 
 app = Flask(__name__)
