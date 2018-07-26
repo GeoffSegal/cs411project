@@ -19,37 +19,48 @@ mysql = MySQL(app)
  
 @app.route('/')
 def home():
-    if not session.get('logged_in'):
+    if 'username' in session:
         return render_template('login.html')
-    else:
-        return render_template('index2.html')
+
+    username_session = escape(session['username']).capitalize()
+    return render_template('index2.html', session_user_name=username_session)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    POST_USERNAME = str(request.form['username'])
-    POST_PASSWORD = str(request.form['password'])
- 
-   
-           
-username_form  = request.form['username']
-    cur.execute("SELECT username FROM user WHERE username = %s;"
-		.format(username_form))
+    if 'username' in session:
+        return render_template('index2.html')
 
-    if not cur.fetchone()[0]:
-	raise ServerError('Invalid username')
+    error = None
+    try:
+        if request.method == 'POST':
+	    username_form  = request.form['username']
+		    cur.execute("SELECT username FROM user WHERE username = %s;"
+				.format(username_form))
 
-    password_form  = request.form['password']
-    cur.execute("SELECT password FROM user WHERE username = %s;"
-		.format(username_form))
+		    if not cur.fetchone()[0]:
+			raise ServerError('Invalid username')
 
-    for row in cur.fetchall():
-	if md5(password_form).hexdigest() == row[0]:
-	    session['username'] = request.form['username']
-	    return render_template('index2.html')
+	    password_form  = request.form['password']
+		    cur.execute("SELECT password FROM user WHERE username = %s;"
+				.format(username_form))
 
-    raise ServerError('Invalid password')
+		    for row in cur.fetchall():
+			if md5(password_form).hexdigest() == row[0]:
+			    session['username'] = request.form['username']
+			    return render_template('index2.html')
 
-   return render_template('login.html', error=error)
+		    raise ServerError('Invalid password')
+
+    except ServerError as e:
+        error = str(e)
+
+    return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return render_template('index2.html')
 
 
 @app.route('/showmovies', methods = ['GET'])
