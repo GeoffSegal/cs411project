@@ -2,6 +2,10 @@
 {% if session['logged_in'] %}
 <p>You're logged in already!</p>
 {% else %}
+{% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+{% endif %}
+
 <p>Register as a new user!</p>
 <form action="/registration" method="POST">
   <input type="username" name="username" placeholder="Username">

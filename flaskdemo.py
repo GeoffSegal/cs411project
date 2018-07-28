@@ -62,6 +62,26 @@ def logout():
     session.pop('username', None)
     return render_template('login.html')
 
+@app.route('/register', methods = ['GET'])
+def register():
+    return render_template('register.html')
+
+@app.route('/registration', methods = ['POST'])
+def registration():
+    POST_USERNAME = str(request.form['username'])
+    POST_PASSWORD = str(request.form['password'])
+    cur = mysql.connection.cursor()
+    error = None
+    cur.execute(('SELECT 1 FROM user WHERE username="{}";').format(POST_USERNAME))
+    if cur.fetchone():
+        error = "username already exists"
+        cur.close()
+        return render_template('register.html', error=error)
+    else:
+        cur.execute(("INSERT INTO user (username, password) VALUES ('{}', '{}');").format(POST_USERNAME, POST_PASSWORD))
+	mysql.connection.commit()
+	cur.close()
+        return render_template('login.html')
 
 @app.route('/showmovies', methods = ['GET'])
 def showmovies():
@@ -73,6 +93,15 @@ def showmovies():
 		cur.close()
 		return render_template('showmovies.html', data=rows)
 
+@app.route('/showfavorites', methods = ['GET'])
+def showfavorites():
+	with app.app_context():
+                cur = mysql.connection.cursor()
+                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
+
+                rows = cur.fetchall()
+                cur.close()
+                return render_template('showfavorites.html', data=rows)
 
 @app.route('/addfavorites', methods = ['POST', 'GET'])
 def addfavorites():
@@ -119,6 +148,53 @@ def ratefavorites():
                 cur.close()
                 return render_template('showfavorites.html', data=rows)
 
+@app.route('/conversations', methods = ['GET'])
+def getConversations():
+        with app.app_context():
+                user = session['username']
+                cur = mysql.connection.cursor()
+                cur.execute(("SELECT * FROM (SELECT DISTINCT to_userid FROM messages WHERE (from_userid = '{}' OR to_userid = '{}') UNION SELECT DISTINCT from_userid FROM messages WHERE (from_userid = '{}' OR to_userid = '{}')) AS t WHERE t.to_userid <> '{}';").format(user, user, user, user, user))
+                rows = cur.fetchall()
+                cur.close()
+		
+		return rows
+
+@app.route('/sendMessage', methods = ['POST'])
+def sendMessage():
+        with app.app_context():
+		#arguments
+                sender = session['username']
+		recipient = request.args.get['recipient']
+		#validate the recipient username?
+		body = request.form['messageBody']
+		
+		#post new message
+                cur = mysql.connection.cursor()
+                cur.execute(("INSERT INTO messages (from_userid, to_userid, message_body) VALUES ('{}', '{}', '{}');").format(user, recipient, body))
+                cur.close()
+
+		#query latest messages
+		cur2 = mysql.connection.cursor()
+		cur2.execute(("SELECT * FROM (SELECT * FROM messages WHERE (from_userid = '{}' OR from_userid = '{}') AND (to_userid = '{}' OR to_userid = '{}') ORDER BY message_time DESC LIMIT 20) AS t  ORDER BY t.message_time;").format(user, recipient, user, recipient))
+		rows = cur2.fetchall()
+		cur2.close()
+
+		return rows
+		
+@app.route('/messages', methods = ['GET'])
+def getMessages():
+	with app.app_context():
+		user = session['username']
+		recipient = request.args.get['recipient']
+		#validate the recipient username?
+
+		#query latest messages
+		cur = mysql.connection.cursor()
+		cur.execute(("SELECT * FROM (SELECT * FROM messages WHERE (from_userid = '{}' OR from_userid = '{}') AND (to_userid = '{}' OR to_userid = '{}') ORDER BY message_time DESC LIMIT 20) AS t  ORDER BY t.message_time;").format(user, recipient, user, recipient))
+		rows = cur.fetchall()
+		cur.close()
+
+		return rows
 
 
 if __name__ == "__main__":
