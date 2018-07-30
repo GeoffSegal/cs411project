@@ -1,0 +1,24 @@
+{% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+{% endif %}
+
+                <p>
+                        <a href="/logout"> Log Out </a><br>
+                       	<a href="/showfavorites"> Favorites </a><br>
+                       	<a href="/genrecs"> Generate Recommendations </a><br>
+                        <a href="/conversations"> Conversations </a><br>
+                        <a href="/messageform"> Send a Message </a><br>
+                        <a href="/"> Search for another movie </a>
+                </p>
+
+
+<form action="/sendMessage" method="POST">
+  <input type="text" name="recipient" placeholder="Recipient">
+  <input type="text" name="messageBody" placeholder="Message Body">
+  <input type="submit" value="Send Message">
+</form>
+
+
+
+
+

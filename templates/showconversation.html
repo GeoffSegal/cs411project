@@ -1,0 +1,63 @@
+<html>
+<head>
+<style>
+#messages {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#messages td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+
+#messages tr:hover {background-color: #ddd;}
+
+#messages th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+</style>
+</head>
+
+       	<title>Conversations</title>
+        <body>
+              	<p>
+                   	<a href="/logout"> Log Out </a><br>
+                        <a href="/showfavorites"> Favorites </a><br>
+                        <a href="/genrecs"> Generate Recommendations </a><br>
+                        <a href="/conversations"> Conversations </a><br>
+                        <a href="/messageform"> Send a Message </a><br>
+                        <a href="/"> Search for another movie </a>
+                </p>
+                <table id="messages">
+                        <tr>
+                            	<th> Message </td>
+                        </tr>
+			<tr> <th> Conversation with {{otheruser}} </th> </tr>
+                        {% for row in data %}
+                        {% if session['username'] %}
+                        <tr bgcolor="#FF0000">
+                        {% else %}
+                       	<tr>
+                       	{% endif %}
+                            	<td> {{ row.message_body}} </td>
+                        </tr><br />
+                        {% endfor %}
+                </table>
+
+<form action="/sendMessage" method="POST">
+  <input type="hidden" name="recipient" value="{{otheruser}}">
+  <input type="text" name="messageBody" placeholder="Message Body">
+  <input type="submit" value="Send Message">
+</form>
+        </body>
+</html>
+
+
+

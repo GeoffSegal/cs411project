@@ -146,7 +146,7 @@ def genrecs():
 		for movie in movierecs:
 			cur.execute(("INSERT INTO recommended (user_id, movie_id) VALUES ('{}', '{}');").format(current_user, movie))
 		mysql.connection.commit()
-		cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = favorites.movie_id;").format(current_user))
+		cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(current_user))
 		rows = cur.fetchall()
 		cur.close()
 	
@@ -158,10 +158,10 @@ def showrecs():
         if 'username' not in session:
                 return render_template('login.html')
         cur = mysql.connection.cursor()
-        cur.execute(("SELECT title FROM movies, recommended WHERE user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(session['username']))
+        cur.execute(("SELECT title, year_released, movies.movie_id, full_name as director, rating FROM movies, directors, ratings, names, recommended WHERE recommended.user_id = '{}' AND movies.movie_id = recommended.movie_id and movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id;").format(session['username']))
         rows = cur.fetchall()
         cur.close()
-	return render_template('showrecs.html', data=rows)
+	return render_template('showmovies.html', data=rows)
 
 
 @app.route('/showmovies', methods = ['GET'])
@@ -171,7 +171,7 @@ def showmovies():
 			return render_template('login.html')
 		moviesearch = request.args.get('movie')
 		cur = mysql.connection.cursor()
-		cur.execute(("select title, movies.movie_id, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id AND title LIKE '%{}%';").format(moviesearch))
+		cur.execute(("select title, year_released, movies.movie_id, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id AND title LIKE '%{}%';").format(moviesearch))
 		rows = cur.fetchall()
 		cur.close()
 		return render_template('showmovies.html', data=rows)
@@ -191,7 +191,7 @@ def addfavorites():
 	with app.app_context():
 		moviesearch = request.args.get('favmovie')
 		cur2 = mysql.connection.cursor()
-		cur2.execute(('SELECT 1 FROM favorites WHERE movie_id="{}";').format(moviesearch))
+		cur2.execute(('SELECT 1 FROM favorites WHERE movie_id="{}" AND user_id = "{}";').format(moviesearch, session['username']))
 		if not cur2.fetchone():
 			cur2.execute(("INSERT INTO favorites (user_id, movie_id) VALUES ('{}', '{}');").format(session['username'], moviesearch))
 		mysql.connection.commit()
@@ -240,20 +240,30 @@ def getConversations():
                 rows = cur.fetchall()
                 cur.close()
 		
-		return rows
+		return render_template("getconversations.html", data=rows)
+
+@app.route('/messageform', methods = ['GET'])
+def messageform():
+	return render_template('messageform.html')
 
 @app.route('/sendMessage', methods = ['POST'])
 def sendMessage():
         with app.app_context():
 		#arguments
                 sender = session['username']
-		recipient = request.args.get['recipient']
+		user = sender
+		recipient = request.form['recipient']
 		#validate the recipient username?
 		body = request.form['messageBody']
 		
 		#post new message
                 cur = mysql.connection.cursor()
+		query = ("INSERT INTO messages (from_userid, to_userid, message_body) VALUES ('{}', '{}', '{}');").format(user, recipient, body)
+                with open("logfile.txt", "w") as f:
+                	f.write(str(query))
+
                 cur.execute(("INSERT INTO messages (from_userid, to_userid, message_body) VALUES ('{}', '{}', '{}');").format(user, recipient, body))
+		mysql.connection.commit()
                 cur.close()
 
 		#query latest messages
@@ -262,13 +272,13 @@ def sendMessage():
 		rows = cur2.fetchall()
 		cur2.close()
 
-		return rows
+		return render_template('showconversation.html', data=rows, otheruser=recipient)
 		
 @app.route('/messages', methods = ['GET'])
 def getMessages():
 	with app.app_context():
 		user = session['username']
-		recipient = request.args.get['recipient']
+		recipient = request.args.get('recipient')
 		#validate the recipient username?
 
 		#query latest messages
@@ -277,7 +287,8 @@ def getMessages():
 		rows = cur.fetchall()
 		cur.close()
 
-		return rows
+		#return render_template('index2.html')
+		return render_template('showconversation.html', data=rows, otheruser=recipient)
 
 
 if __name__ == "__main__":

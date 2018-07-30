@@ -1,22 +1,21 @@
 <html>
 <head>
 <style>
-#movies {
+#messages {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
 
-#movies td, #customers th {
+#messages td, #customers th {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
-#movies tr:nth-child(even){background-color: #f2f2f2;}
 
-#movies tr:hover {background-color: #ddd;}
+#messages tr:hover {background-color: #ddd;}
 
-#movies th {
+#messages th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
@@ -25,32 +24,25 @@
 }
 </style>
 </head>
-	<title>website</title>
-	<body>
-               	<p>
+
+       	<title>Conversations</title>
+        <body>
+              	<p>
                    	<a href="/logout"> Log Out </a><br>
                         <a href="/showfavorites"> Favorites </a><br>
                         <a href="/genrecs"> Generate Recommendations </a><br>
                         <a href="/conversations"> Conversations </a><br>
                         <a href="/messageform"> Send a Message </a><br>
-			<a href="/"> Search for another movie </a>
+                        <a href="/"> Search for another movie </a>
                 </p>
-		<table id="movies">
+		<table id="messages">
 			<tr>
-				<th>Title</th>
-				<th>Director</th>
-				<th>Year Released</th>
-				<th>IMDB Rating</th>
-				<th>Favorite</th>
+				<th> Users </th>
 			</tr>
 			{% for row in data %}
-			<tr>
-				<td> {{ row.title}} </td>
-				<td> {{ row.director}} </td>
-				<td> {{ row.year_released}} </td>
-				<td> {{ row.rating}} </td>
-				<td> <a href = "/addfavorites?action=post&favmovie={{ row.movie_id}}"> Add to Favorites </a></td>
-			</tr>
+				<tr>
+					<td><a href="/messages?recipient={{row.to_userid}}"> {{row.to_userid}} </a></td>
+				</tr>
 			{% endfor %}
 		</table>
 	</body>

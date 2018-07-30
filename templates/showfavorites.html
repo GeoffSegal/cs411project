@@ -2,6 +2,32 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+
+<head>
+<style>
+#movies {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#movies td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#movies tr:nth-child(even){background-color: #f2f2f2;}
+
+#movies tr:hover {background-color: #ddd;}
+
+#movies th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
 .dropbtn {
     background-color: #4CAF50;
     color: white;
@@ -44,10 +70,17 @@
                    	<a href="/logout"> Log Out </a><br>
                         <a href="/showfavorites"> Favorites </a><br>
                         <a href="/genrecs"> Generate Recommendations </a><br>
-                        <a href="/showmessages"> Show Messages </a><br>
+                        <a href="/conversations"> Conversations </a><br>
+			<a href="/messageform"> Send a Message </a><br>
 			<a href="/"> Search for Another Movie </a>
                 </p>
-		<tbody>
+		<table id="movies">
+			<tr>
+				<th>Title</th>
+				<th>Your Rating</th>
+				<th>Change Your Rating</th>
+				<th>Remove from Favorites</th>
+			</tr>
 			{% for row in data %}
 			<tr>
 				<td> {{ row.title}} </td>
@@ -71,6 +104,6 @@
 				<td> <a href = "/removefavorites?action=post&favmovie={{ row.movie_id}}"> Remove From Favorites </a></td>
 			</tr><br />
 			{% endfor %}
-		</tbody>
+		</table>
 	</body>
 </html>

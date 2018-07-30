@@ -1,5 +1,32 @@
 <html>
-	<title>website</title>
+<head>
+<style>
+#movies {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#movies td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#movies tr:nth-child(even){background-color: #f2f2f2;}
+
+#movies tr:hover {background-color: #ddd;}
+
+#movies th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+</style>
+</head>
+
+	<title>Recommendations for {{session['username']}}</title>
 	<body>
                	<p>
                    	<a href="/logout"> Log Out </a><br>
@@ -8,18 +35,15 @@
                         <a href="/showmessages"> Show Messages </a><br>
 			<a href="/"> Search for another movie </a>
                 </p>
-
-		<tbody>
+		<table id="movies">
 			<tr>
-				<td> title </td>
-				<td> year released </td>
-				<td> rating </td>
+				<th> Recommended Title </td>
 			</tr><br />
 			{% for row in data %}
 			<tr>
 				<td> {{ row.title}} </td>
 			</tr><br />
 			{% endfor %}
-		</tbody>
+		</table>
 	</body>
 </html>
