@@ -1,0 +1,25 @@
+<html>
+	<title>website</title>
+	<body>
+               	<p>
+                   	<a href="/logout"> Log Out </a><br>
+                        <a href="/showfavorites"> Favorites </a><br>
+                        <a href="/genrecs"> Generate Recommendations </a><br>
+                        <a href="/showmessages"> Show Messages </a><br>
+			<a href="/"> Search for another movie </a>
+                </p>
+
+		<tbody>
+			<tr>
+				<td> title </td>
+				<td> year released </td>
+				<td> rating </td>
+			</tr><br />
+			{% for row in data %}
+			<tr>
+				<td> {{ row.title}} </td>
+			</tr><br />
+			{% endfor %}
+		</tbody>
+	</body>
+</html>

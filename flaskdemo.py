@@ -4,12 +4,13 @@ from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from hashlib import md5
 import os
+import logging
 from sqlalchemy.orm import sessionmaker
  
 
 app = Flask(__name__)
 app.secret_key = 'secret'
-
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
@@ -17,6 +18,54 @@ app.config['MYSQL_DB'] = 'movies'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
+
+
+def recommend(user):
+
+        cur = mysql.connection.cursor()
+
+        cur.execute("SELECT movie_id from movies order by movie_id;")
+	if cur.fetchone():
+		potentialmovies = [ x['movie_id'] for x in cur.fetchall()]
+
+        cur.execute("SELECT actor_id from actors, favorites where actors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+        actors = [ x for x in cur.fetchall() ]
+        
+        cur.execute("SELECT genre from movies, favorites where movies.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+        genres = [ x for x in cur.fetchall()]
+
+        cur.execute("SELECT director from directors, favorites where directors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+        directors = [ x for x in cur.fetchall()]
+
+        points = [0]*len(potentialmovies)
+	
+	
+        for idx in range(len(genres)):
+		#query = ("SELECT movie_id, CASE WHEN genre = '{}' THEN 20 ELSE 0 END from movies ORDER BY movie_id;").format(genres[idx])
+		#with open("logfile.txt", "w") as f:
+		#	f.write(str(genres[1]['genre'])) 
+                cur.execute(("SELECT movie_id, CASE WHEN genre = '{}' THEN 20 ELSE 0 END AS points from movies ORDER BY movie_id;").format(genres[idx]['genre']))
+                temp_points = [x['points'] for x in cur.fetchall()]
+                points = [x+y for x,y in zip(points,temp_points)]
+	
+        for idx in range(len(actors)):
+                cur.execute(("SELECT movie_id, case when movie_id IN(select movie_id from actors where actor_id = '{}') then 30 else 0 end AS points from movies ORDER BY movie_id;").format(actors[idx]['actor_id']))
+                temp_points = [x['points'] for x in cur.fetchall()]
+                points = [x+y for x,y in zip(points,temp_points)]
+
+        for idx in range(len(directors)):
+                cur.execute(("SELECT movie_id, case when movie_id IN(select movie_id from directors where director = '{}') then 50 else 0 end AS points from movies ORDER BY movie_id;").format(directors[idx]['director']))
+                temp_points = [x['points'] for x in cur.fetchall()]
+                points = [x+y for x,y in zip(points,temp_points)]
+
+        cur.close()
+
+        Z = [x for _,x in sorted(zip(points,potentialmovies), reverse=True)]
+
+        Z = Z[:5]
+	return Z
+	
+	#return []
  
 @app.route('/')
 def home():
@@ -83,9 +132,43 @@ def registration():
 	cur.close()
         return render_template('login.html')
 
+@app.route('/genrecs', methods = ['GET'])
+def genrecs():
+	rows = []
+	movierecs = []
+	with app.app_context():
+		if 'username' not in session:
+			return render_template('login.html')
+		current_user = session['username']
+		movierecs = recommend(current_user)
+		cur = mysql.connection.cursor()
+		cur.execute(("delete from recommended where user_id = '{}';").format(current_user))
+		for movie in movierecs:
+			cur.execute(("INSERT INTO recommended (user_id, movie_id) VALUES ('{}', '{}');").format(current_user, movie))
+		mysql.connection.commit()
+		cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = favorites.movie_id;").format(current_user))
+		rows = cur.fetchall()
+		cur.close()
+	
+		return render_template('showrecs.html', data=rows)
+@app.route('/showrecs', methods = ['GET'])
+def showrecs():
+	rows = []
+	
+        if 'username' not in session:
+                return render_template('login.html')
+        cur = mysql.connection.cursor()
+        cur.execute(("SELECT title FROM movies, recommended WHERE user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(session['username']))
+        rows = cur.fetchall()
+        cur.close()
+	return render_template('showrecs.html', data=rows)
+
+
 @app.route('/showmovies', methods = ['GET'])
 def showmovies():
 	with app.app_context():
+		if 'username' not in session:
+			return render_template('login.html')
 		moviesearch = request.args.get('movie')
 		cur = mysql.connection.cursor()
 		cur.execute(("select title, movies.movie_id, full_name as director, rating from movies, directors, ratings, names where movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id AND title LIKE '%{}%';").format(moviesearch))
