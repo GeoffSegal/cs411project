@@ -24,29 +24,29 @@ def recommend(user):
 	cur = mysql.connection.cursor()
 
 	cur.execute("SELECT actor_id from actors, favorites where actors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-	actors = [ x[0] for x in cur.fetchall() ]
+	actors = [ x['actor_id'] for x in cur.fetchall() ]
 
 	cur.execute("SELECT genre from movies, favorites where movies.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-	genres = [ x[0] for x in cur.fetchall()]
+	genres = [ x['genre'] for x in cur.fetchall()]
 
 	cur.execute("SELECT director from directors, favorites where directors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-	directors = [ x[0] for x in cur.fetchall()]
+	directors = [ x['director'] for x in cur.fetchall()]
 
 	cur.execute("SELECT movie_id from favorites where user_id=\'{}\';".format(user))
-	favorites = [ x[0] for x in cur.fetchall()]
+	favorites = [ x['movie_id'] for x in cur.fetchall()]
 
 
 	format_strings = ','.join(['%s']*len(genres))
 	cur.execute("SELECT movie_id from movies where genre IN (%s)" % format_strings, tuple(genres))
-	temp_genres = [x[0] for x in cur.fetchall()]
+	temp_genres = [x['movie_id'] for x in cur.fetchall()]
 
 	format_strings = ','.join(['%s']*len(actors))
 	cur.execute("SELECT movie_id from actors where actor_id in (%s)" % format_strings, tuple(actors))
-	temp_actors = [x[0] for x in cur.fetchall()]
+	temp_actors = [x['movie_id'] for x in cur.fetchall()]
 
 	format_strings = ','.join(['%s']*len(directors))
 	cur.execute("SELECT movie_id from directors where director in(%s)" % format_strings, tuple(directors))
-	temp_directors = [x[0] for x in cur.fetchall()]
+	temp_directors = [x['movie_id'] for x in cur.fetchall()]
 	
 	cur.close()
 
