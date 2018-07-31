@@ -6,7 +6,7 @@ from hashlib import md5
 import os
 import logging
 from sqlalchemy.orm import sessionmaker
- 
+import pandas as pd 
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -21,50 +21,50 @@ mysql = MySQL(app)
 
 
 def recommend(user):
+	cur = mysql.connection.cursor()
 
-        cur = mysql.connection.cursor()
+	cur.execute("SELECT actor_id from actors, favorites where actors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+	actors = [ x[0] for x in cur.fetchall() ]
 
-        cur.execute("SELECT movie_id from movies order by movie_id;")
-	if cur.fetchone():
-		potentialmovies = [ x['movie_id'] for x in cur.fetchall()]
+	cur.execute("SELECT genre from movies, favorites where movies.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+	genres = [ x[0] for x in cur.fetchall()]
 
-        cur.execute("SELECT actor_id from actors, favorites where actors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-        actors = [ x for x in cur.fetchall() ]
-        
-        cur.execute("SELECT genre from movies, favorites where movies.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-        genres = [ x for x in cur.fetchall()]
+	cur.execute("SELECT director from directors, favorites where directors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
+	directors = [ x[0] for x in cur.fetchall()]
 
-        cur.execute("SELECT director from directors, favorites where directors.movie_id = favorites.movie_id and user_id=\'{}\';".format(user))
-        directors = [ x for x in cur.fetchall()]
+	cur.execute("SELECT movie_id from favorites where user_id=\'{}\';".format(user))
+	favorites = [ x[0] for x in cur.fetchall()]
 
-        points = [0]*len(potentialmovies)
+
+	format_strings = ','.join(['%s']*len(genres))
+	cur.execute("SELECT movie_id from movies where genre IN (%s)" % format_strings, tuple(genres))
+	temp_genres = [x[0] for x in cur.fetchall()]
+
+	format_strings = ','.join(['%s']*len(actors))
+	cur.execute("SELECT movie_id from actors where actor_id in (%s)" % format_strings, tuple(actors))
+	temp_actors = [x[0] for x in cur.fetchall()]
+
+	format_strings = ','.join(['%s']*len(directors))
+	cur.execute("SELECT movie_id from directors where director in(%s)" % format_strings, tuple(directors))
+	temp_directors = [x[0] for x in cur.fetchall()]
 	
-	
-        for idx in range(len(genres)):
-		#query = ("SELECT movie_id, CASE WHEN genre = '{}' THEN 20 ELSE 0 END from movies ORDER BY movie_id;").format(genres[idx])
-		#with open("logfile.txt", "w") as f:
-		#	f.write(str(genres[1]['genre'])) 
-                cur.execute(("SELECT movie_id, CASE WHEN genre = '{}' THEN 20 ELSE 0 END AS points from movies ORDER BY movie_id;").format(genres[idx]['genre']))
-                temp_points = [x['points'] for x in cur.fetchall()]
-                points = [x+y for x,y in zip(points,temp_points)]
-	
-        for idx in range(len(actors)):
-                cur.execute(("SELECT movie_id, case when movie_id IN(select movie_id from actors where actor_id = '{}') then 30 else 0 end AS points from movies ORDER BY movie_id;").format(actors[idx]['actor_id']))
-                temp_points = [x['points'] for x in cur.fetchall()]
-                points = [x+y for x,y in zip(points,temp_points)]
+	cur.close()
 
-        for idx in range(len(directors)):
-                cur.execute(("SELECT movie_id, case when movie_id IN(select movie_id from directors where director = '{}') then 50 else 0 end AS points from movies ORDER BY movie_id;").format(directors[idx]['director']))
-                temp_points = [x['points'] for x in cur.fetchall()]
-                points = [x+y for x,y in zip(points,temp_points)]
 
-        cur.close()
 
-        Z = [x for _,x in sorted(zip(points,potentialmovies), reverse=True)]
 
-        Z = Z[:5]
-	return Z
-	
+	all_movies = temp_genres + temp_actors + temp_directors
+	all_points = [20]*len(temp_genres) + [30] * len(temp_actors) + [50] * len(temp_directors)
+
+	df1 = pd.DataFrame( {'movie_id': all_movies, 'points': all_points})
+	df2 = df1.groupby('movie_id')['points'].sum()
+	df3 = df2.reset_index()
+	df4 = df3[~df3['movie_id'].isin(favorites)]
+
+
+	recommendedMovies = df4.sort_values(by=['points'], ascending=False)['movie_id'][:5].tolist()
+
+	return recommendedMovies
 	#return []
  
 @app.route('/')
