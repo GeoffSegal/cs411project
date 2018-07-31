@@ -146,11 +146,12 @@ def genrecs():
 		for movie in movierecs:
 			cur.execute(("INSERT INTO recommended (user_id, movie_id) VALUES ('{}', '{}');").format(current_user, movie))
 		mysql.connection.commit()
-		cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(current_user))
+		cur.execute(("SELECT title, year_released, movies.movie_id, full_name as director, rating FROM movies, directors, ratings, names, recommended WHERE recommended.user_id = '{}' AND movies.movie_id = recommended.movie_id and movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id;").format(session['username']))
+		#cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(current_user))
 		rows = cur.fetchall()
 		cur.close()
 	
-		return render_template('showrecs.html', data=rows)
+		return render_template('showmovies.html', data=rows)
 @app.route('/showrecs', methods = ['GET'])
 def showrecs():
 	rows = []
