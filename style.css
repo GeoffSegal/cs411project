@@ -21,6 +21,19 @@ padding: 20px;
 border-radius: 5px
 }
  
+.bg-img {
+  /* The image used */
+  background-image: url("image.jpg");
+
+  /* Control the height of the image */
+  min-height: 380px;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .app-title {
 text-align: center;
 color: #777;
