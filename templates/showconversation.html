@@ -65,15 +65,7 @@
 
        	<title>Conversations</title>
 	<body>
-              	<p>
-                   	<a href="/logout"> Log Out </a><br>
-                        <a href="/showfavorites"> Favorites </a><br>
-                        <a href="/genrecs"> Generate Recommendations </a><br>
-                        <a href="/showrecs"> View Recommendations </a><br>
-                        <a href="/conversations"> Conversations </a><br>
-                        <a href="/messageform"> Send a Message </a><br>
-                        <a href="/"> Search for another movie </a>
-                </p>
+<div class="container">
                 <table id="messages">
                         <tr>
                             	<th> Message </td>
@@ -81,11 +73,11 @@
 			<tr> <th> Conversation with {{otheruser}} </th> </tr>
                         {% for row in data %}
                         {% if (session['username'] == row.from_userid) %}
-                        <tr bgcolor="#FF0000">
+                        <tr>
                         {% else %}
-                       	<tr>
+                       	<tr bgcolor="#a2d6a2">
                        	{% endif %}
-                            	<td> {{ row.message_body}} </td>
+                            	<td   {% if (session['username'] == row.to_userid) %} align="right" {% else %}  align="left" {%endif%}  > {{ row.message_body}} </td>
                         </tr><br />
                         {% endfor %}
                 </table>
@@ -95,6 +87,7 @@
   <input type="text" name="messageBody" placeholder="Message Body">
   <input type="submit" value="Send Message">
 </form>
+</div>
         </body>
 </html>
 
