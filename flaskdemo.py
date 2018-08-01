@@ -292,7 +292,21 @@ def getMessages():
 
 		#return render_template('index2.html')
 		return render_template('showconversation.html', data=rows, otheruser=recipient)
-
+	
+def call_showfavorites():
+    try:
+        conn = mysql.connection.cursor()
+        cursor = conn.cursor()
+ 
+        cursor.callproc('showfavorites')
+ 
+    except Error as e:
+        print(e)
+ 
+    finally:
+        cursor.close()
+        conn.close()
+ 
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(50)
