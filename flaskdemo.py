@@ -142,13 +142,15 @@ def genrecs():
 		current_user = session['username']
 		movierecs = recommend(current_user)
 		cur = mysql.connection.cursor()
+        cur.execute("start transaction;")
 		cur.execute(("delete from recommended where user_id = '{}';").format(current_user))
 		for movie in movierecs:
 			cur.execute(("INSERT INTO recommended (user_id, movie_id) VALUES ('{}', '{}');").format(current_user, movie))
 		mysql.connection.commit()
 		cur.execute(("SELECT title, year_released, movies.movie_id, full_name as director, rating FROM movies, directors, ratings, names, recommended WHERE recommended.user_id = '{}' AND movies.movie_id = recommended.movie_id and movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id;").format(session['username']))
 		#cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(current_user))
-		rows = cur.fetchall()
+        rows = cur.fetchall()
+        cur.execute("commit;")
 		cur.close()
 	
 		return render_template('showmovies.html', data=rows)
@@ -295,4 +297,3 @@ def getMessages():
 if __name__ == "__main__":
     app.secret_key = os.urandom(50)
     app.run(debug=True,host='0.0.0.0', port=4000)
-
