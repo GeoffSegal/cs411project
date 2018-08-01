@@ -8,8 +8,8 @@ box-sizing: border-box;
 }
 body {
 font-family: Arial;
-background-color: #3498DB;
 padding: 50px;
+background-image: url( img/image.jpg );
 }
 .login {
 margin: 20px auto;
@@ -33,6 +33,8 @@ text-align: center;
 .control-group {
 margin-bottom: 10px;
 }
+
+
  
 input {
 text-align: center;
