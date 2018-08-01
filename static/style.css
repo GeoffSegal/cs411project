@@ -8,8 +8,9 @@ box-sizing: border-box;
 }
 body {
 font-family: Arial;
+background-color: #3498DB;
 padding: 50px;
-background-image: url( img/image.jpg );
+
 }
 .login {
 margin: 20px auto;
