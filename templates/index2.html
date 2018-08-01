@@ -1,23 +1,60 @@
 <html>
 	<title>website</title>
+	<head>
+	<title> Movie Recommendation System</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+	</head>
+
+	<center>
+
+	<header>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	  <a class="navbar-brand" href="#">Hollywood++</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navba<nav class="navbar navbar-expand-lg navbar-dark bg-primary">rColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+	
+  <div class="collapse navbar-collapse" id="navbarColor01">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showfavorites">Favorites</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showrecs">Show Recommendations</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/conversations">Conversations</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/messageform">Send a Message</a>
+      </li>
+      </ul>
+	<form class="form-inline m-2 my-lg-0">
+	<a href="/logout" class="btn btn-secondary my-2 my-sm-0">Logout</a>
+        </form>
+      
+    
+  </div>
+</nav>
+	</header>
 	<body>
 
-
+	<div class="container">
 		<form action="showmovies" method="GET">
 			<input type="text" id="searchtitle" name="movie">
 			<input type="submit" value="Search" name = "submit" id="submit">
-		</form>
+</form>	
 
-
+	
+	</div>
 	</body>
-                <p>
-			<a href="/logout"> Log Out </a><br>
-			<a href="/showfavorites"> Favorites </a><br>
-			<a href="/genrecs"> Generate Recommendations </a><br>
-                        <a href="/showrecs"> View Recommendations </a><br>
-			<a href="/conversations"> Conversations </a><br>
-                        <a href="/messageform"> Send a Message </a>
-		</p>	
+	
+	</center>
 
 
 </html>

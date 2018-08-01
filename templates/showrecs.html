@@ -1,21 +1,21 @@
 <html>
-<head>
+      	<title>website</title>
+        <head>
+	<title> Movie Recommendation System</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
 <style>
 #movies {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
-
 #movies td, #customers th {
     border: 1px solid #ddd;
     padding: 8px;
 }
-
 #movies tr:nth-child(even){background-color: #f2f2f2;}
-
 #movies tr:hover {background-color: #ddd;}
-
 #movies th {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -24,7 +24,45 @@
     color: white;
 }
 </style>
-</head>
+        </head>
+
+
+        <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+          <a class="navbar-brand" href="#">Hollywood++</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navba<nav class="navbar navbar$
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarColor01">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showfavorites">Favorites</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showrecs">Show Recommendations</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/conversations">Conversations</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/messageform">Send a Message</a>
+      </li>
+      </ul>
+	<form class="form-inline m-2 my-lg-0">
+        <a href="/logout" class="btn btn-secondary my-2 my-sm-0">Logout</a>
+        </form>
+
+
+  </div>
+</nav>
+      	</header>
+
+
 
 	<title>Recommendations for {{session['username']}}</title>
 	<body>

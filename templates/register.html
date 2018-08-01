@@ -1,17 +1,38 @@
-<link rel="stylesheet" href="/static/style.css" type="text/css">
+	
+	<head>
+		<title> Movie Recommendation System</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+	</head>
+
+	<header>
+		<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	  		<a class="navbar-brand" href="#">Hollywood++</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navba<nav class="navbar navbar-expand-lg navbar-dark bg-primary">rColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+  			</button>
+			<div class="collapse navbar-collapse" id="navbarColor01">
+    				<ul class="navbar-nav mr-auto">
+    				</ul>
+  			</div>
+		</nav>
+	</header>
+
 {% block body %}
+<center>
+<h1>Register as a New User</h1>
 {% if session['logged_in'] %}
 <p>You're logged in already!</p>
 {% else %}
 {% if error %}
     <p class=error><strong>Error:</strong> {{ error }}
 {% endif %}
-<p>Register as a new user!</p>
 <form action="/registration" method="POST">
   <input type="username" name="username" placeholder="Username">
   <input type="password" name="password" placeholder="Password">
   <input type="submit" value="registration">
 </form>
+</center>
 {% endif %}
 {% endblock %}
 
