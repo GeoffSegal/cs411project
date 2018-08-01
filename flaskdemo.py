@@ -298,6 +298,7 @@ def getMessages():
 
 		#return render_template('index2.html')
 		return render_template('showconversation.html', data=rows, otheruser=recipient)
+	
 
 
 if __name__ == "__main__":
