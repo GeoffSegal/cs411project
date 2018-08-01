@@ -127,7 +127,12 @@ def registration():
         cur.close()
         return render_template('register.html', error=error)
     else:
-        cur.execute(("INSERT INTO user (username, password) VALUES ('{}', '{}');").format(POST_USERNAME, POST_PASSWORD))
+        try:
+		cur.execute(("INSERT INTO user (username, password) VALUES ('{}', '{}');").format(POST_USERNAME, POST_PASSWORD))
+	except Exception as e:
+		error = "password is not at least 6 characters long"
+		cur.close()
+		return render_template('register.html', error=error)
 	mysql.connection.commit()
 	cur.close()
         return render_template('login.html')
@@ -142,17 +147,17 @@ def genrecs():
 		current_user = session['username']
 		movierecs = recommend(current_user)
 		cur = mysql.connection.cursor()
-        cur.execute("start transaction;")
+        	cur.execute("start transaction;")
 		cur.execute(("delete from recommended where user_id = '{}';").format(current_user))
 		for movie in movierecs:
 			cur.execute(("INSERT INTO recommended (user_id, movie_id) VALUES ('{}', '{}');").format(current_user, movie))
+		#cur.execute("commit;")
 		mysql.connection.commit()
 		cur.execute(("SELECT title, year_released, movies.movie_id, full_name as director, rating FROM movies, directors, ratings, names, recommended WHERE recommended.user_id = '{}' AND movies.movie_id = recommended.movie_id and movies.movie_id = directors.movie_id AND DIRECTOR = name_id AND movies.movie_id = ratings.movie_id;").format(session['username']))
 		#cur.execute(("SELECT title FROM movies, recommended where user_id = '{}' AND movies.movie_id = recommended.movie_id;").format(current_user))
-        rows = cur.fetchall()
-        cur.execute("commit;")
-		cur.close()
+	        rows = cur.fetchall()
 	
+		cur.close()	
 		return render_template('showmovies.html', data=rows)
 @app.route('/showrecs', methods = ['GET'])
 def showrecs():
@@ -183,7 +188,8 @@ def showmovies():
 def showfavorites():
 	with app.app_context():
                 cur = mysql.connection.cursor()
-                cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
+                #cur.execute(("select DISTINCT title, movies.movie_id, rating from movies, favorites where movies.movie_id = favorites.movie_id AND favorites.user_id = '{}';").format(session['username']))
+		cur.execute(("call getfaves('{}');").format(session['username']))
 
                 rows = cur.fetchall()
                 cur.close()
